@@ -24,22 +24,18 @@
 
 DEFINE_MSM_MUTEX(msm_eeprom_mutex);
 uint8_t g_s5k3p3_otp_module_id = 0;
-uint8_t g_ov5670_otp_module_id = 0;
-uint8_t g_ov16880_otp_module_id = 0;
-
-#ifdef CONFIG_COMPAT
-static struct v4l2_file_operations msm_eeprom_v4l2_subdev_fops;
-static long msm_eeprom_subdev_fops_ioctl32(struct file *file,
-	unsigned int cmd,unsigned long arg);
-#endif
-
-uint8_t g_s5k3p3_otp_module_id = 0;
 uint8_t g_s5k3p3_otp_vcm_id = 0;
 uint8_t g_ov16880_otp_module_id = 0;
 uint8_t g_ov5670_otp_module_id = 0;
 uint8_t g_s5k5e8_otp_month = 0;
 uint8_t g_s5k5e8_otp_day = 0;
 uint8_t g_s5k5e8_otp_lens_id = 0;
+
+#ifdef CONFIG_COMPAT
+static struct v4l2_file_operations msm_eeprom_v4l2_subdev_fops;
+static long msm_eeprom_subdev_fops_ioctl32(struct file *file,
+	unsigned int cmd,unsigned long arg);
+#endif
 
 /**
   * msm_get_read_mem_size - Get the total size for allocation
@@ -548,7 +544,6 @@ static int msm_eeprom_power_up(struct msm_eeprom_ctrl_t *e_ctrl,
 	}
 	return rc;
 }
-
 
 /**
   * msm_eeprom_power_up - Do power up, parse and power down
@@ -1275,7 +1270,6 @@ static int msm_eeprom_spi_setup(struct spi_device *spi)
 	e_ctrl->msm_sd.sd.entity.type = MEDIA_ENT_T_V4L2_SUBDEV;
 	e_ctrl->msm_sd.sd.entity.group_id = MSM_CAMERA_SUBDEV_EEPROM;
 	msm_sd_register(&e_ctrl->msm_sd);
-
 	e_ctrl->is_supported = (e_ctrl->is_supported << 1) | 1;
 	CDBG("%s success result=%d supported=%x X\n", __func__, rc,
 	     e_ctrl->is_supported);
@@ -1621,11 +1615,13 @@ static long msm_eeprom_subdev_do_ioctl32(
 }
 
 static long msm_eeprom_subdev_fops_ioctl32(struct file *file, unsigned int cmd,
-	unsigned long arg) {
+	unsigned long arg)
+{
 	return video_usercopy(file, cmd, arg, msm_eeprom_subdev_do_ioctl32);
 }
 
 #endif
+/* todo - check code
 static int s5k3p3_set_otp_module_id(struct msm_eeprom_ctrl_t *e_ctrl)
 {
 
@@ -1704,7 +1700,7 @@ static int ov5670_set_otp_module_id(struct msm_eeprom_ctrl_t *e_ctrl)
 
 	return 0;
 }
-
+*/
 static void s5k3p3_set_otp_module_id(struct msm_eeprom_ctrl_t *e_ctrl)
 {
 	if (e_ctrl->cal_data.mapdata[0] == 1) {
@@ -1905,23 +1901,23 @@ static int msm_eeprom_platform_probe(struct platform_device *pdev)
 		{
             CDBG("eeprom_name = %s\n", eb_info->eeprom_name);
 			if (strcmp(eb_info->eeprom_name, "s5k3p3_omida01") == 0 ||
-					strcmp(eb_info->eeprom_name, "s5k3p3_gt24c64") == 0) 
+					strcmp(eb_info->eeprom_name, "s5k3p3_gt24c64") == 0)
             {
 				s5k3p3_set_otp_module_id(e_ctrl);
-			} 
+			}
             else if (strcmp(eb_info->eeprom_name, "ov16880_f16v01a") == 0 ||
-					strcmp(eb_info->eeprom_name, "ov16880_omida05") == 0) 
+					strcmp(eb_info->eeprom_name, "ov16880_omida05") == 0)
             {
 				ov16880_set_otp_module_id(e_ctrl);
-			} 
-            else if (strcmp(eb_info->eeprom_name, "sunny_omi5f06") == 0) 
+			}
+            else if (strcmp(eb_info->eeprom_name, "sunny_omi5f06") == 0)
             {
 				ov5670_set_otp_module_id(e_ctrl);
-			} 
-            else if (strcmp(eb_info->eeprom_name, "s5k5e8_z5e8yab") == 0) 
+			}
+            else if (strcmp(eb_info->eeprom_name, "s5k5e8_z5e8yab") == 0)
             {
 				s5k5e8_set_otp_module_id(e_ctrl);
-			} 
+			}
             else
                 CDBG("there is no need special process\n");
 		}
