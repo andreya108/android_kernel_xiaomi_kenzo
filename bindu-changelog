@@ -1,3 +1,11 @@
+0.3.3
+-----
+- fixed battery -2% issue
+
+0.3.2
+-----
+- fixed battery temp
+
 0.3.1
 -----
 - picked some fixes from flux kernel
